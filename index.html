@@ -680,6 +680,7 @@
             }
 
             function hideModal() {
+                // Ocultar la ventana modal y quitar interacción de puntero
                 modal.classList.remove('opacity-100', 'pointer-events-auto');
                 modal.classList.add('opacity-0', 'pointer-events-none');
                 modalCard.classList.remove('scale-100');
@@ -687,40 +688,67 @@
             }
 
             function setupUIEvents() {
-                closeModal.addEventListener('click', hideModal);
-                modalOkBtn.addEventListener('click', hideModal);
+                // Eventos para cerrar el modal desde los botones
+                if (closeModal) closeModal.addEventListener('click', hideModal);
+                if (modalOkBtn) modalOkBtn.addEventListener('click', hideModal);
 
-                audioBtn.addEventListener('click', () => {
-                    if (bgMusic.paused) {
-                        bgMusic.play().then(() => {
-                            audioIcon.className = "fas fa-pause text-base";
-                        }).catch(err => {
-                            alert("Asegúrate de colocar tu canción en la carpeta wwwroot con el nombre 'cancion.mp3'.");
-                        });
-                    } else {
-                        bgMusic.pause();
-                        audioIcon.className = "fas fa-music text-base";
-                    }
-                });
+                // Cerrar modal al hacer clic en el fondo oscuro fuera de la tarjeta
+                if (modal) {
+                    modal.addEventListener('click', (event) => {
+                        if (event.target === modal) {
+                            hideModal();
+                        }
+                    });
+                }
 
-                autoRotateBtn.addEventListener('click', () => {
-                    autoRotate = !autoRotate;
-                    controls.autoRotate = autoRotate;
-                    autoRotateBtn.classList.toggle('bg-amber-500/30');
-                });
+                // Control del reproductor de audio
+                if (audioBtn) {
+                    audioBtn.addEventListener('click', () => {
+                        if (bgMusic.paused) {
+                            bgMusic.play().then(() => {
+                                if (audioIcon) audioIcon.className = "fas fa-pause text-base";
+                            }).catch(err => {
+                                alert("Asegúrate de colocar tu canción en la carpeta wwwroot con el nombre 'cancion.mp3'.");
+                            });
+                        } else {
+                            bgMusic.pause();
+                            if (audioIcon) audioIcon.className = "fas fa-music text-base";
+                        }
+                    });
+                }
 
-                resetCamBtn.addEventListener('click', () => {
-                    new TWEEN.Tween(camera.position)
-                        .to({ x: 0, y: 130, z: 230 }, 1500)
-                        .easing(TWEEN.Easing.Cubic.Out)
-                        .start();
+                // Control de auto-rotación
+                if (autoRotateBtn) {
+                    autoRotateBtn.addEventListener('click', () => {
+                        autoRotate = !autoRotate;
+                        controls.autoRotate = autoRotate;
+                        autoRotateBtn.classList.toggle('bg-amber-500/30');
+                    });
+                }
 
-                    new TWEEN.Tween(controls.target)
-                        .to({ x: 0, y: 0, z: 0 }, 1500)
-                        .easing(TWEEN.Easing.Cubic.Out)
-                        .start();
-                });
+                // Reiniciar posición de la cámara
+                if (resetCamBtn) {
+                    resetCamBtn.addEventListener('click', () => {
+                        new TWEEN.Tween(camera.position)
+                            .to({ x: 0, y: 130, z: 230 }, 1500)
+                            .easing(TWEEN.Easing.Cubic.Out)
+                            .start();
+
+                        new TWEEN.Tween(controls.target)
+                            .to({ x: 0, y: 0, z: 0 }, 1500)
+                            .easing(TWEEN.Easing.Cubic.Out)
+                            .start();
+                    });
+                }
             }
+
+            // Inicialización de eventos globales y animación
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('click', onDocumentClick);
+
+            setupUIEvents();
+            animate();
+        };
     </script>
 </body>
 </html>
